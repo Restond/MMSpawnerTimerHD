@@ -20,12 +20,13 @@
 
 ## 📋 变量列表
 
-| 变量 | 说明 | 示例输出 |
-|------|------|----------|
-| `%mmspawner_remaining_<名称>%` | 剩余秒数 | `45` |
-| `%mmspawner_time_<名称>%` | 格式化时间 | `00:45` |
-| `%mmspawner_status_<名称>%` | 状态文本 | `计时中` / `已刷新` |
-| `%mmspawner_ready_<名称>%` | 是否就绪 | `true` / `false` |
+| 变量                           | 说明     | 示例输出             |
+|------------------------------|--------|------------------|
+| `%mmspawner_remaining_<名称>%` | 剩余秒数   | `45`             |
+| `%mmspawner_time_<名称>%`      | 格式化时间  | `00:45`          |
+| `%mmspawner_status_<名称>%`    | 状态文本   | `计时中` / `已刷新`    |
+| `%mmspawner_ready_<名称>%`     | 是否就绪   | `true` / `false` |
+| `%mmspawner_config_text%`    | 倒计时文本 | `等待刷怪中...`         |
 
 ## ⚙️ 配置文件
 
@@ -43,27 +44,6 @@ messages:
   counting: "计时中"
   not-found: "N/A"
 
-debug: false
-```
-
-## 💡 使用示例
-
-### 记分板配置 (ScoreboardAPI)
-```yaml
-scoreboard:
-  - "&b&lBOSS 刷怪点"
-  - "&7━━━━━━━━━━━━"
-  - "&e暗黑龙王: %mmspawner_time_dragon%"
-  - "&e熔岩巨人: %mmspawner_time_lavagiant%"
-```
-
-### 全息图配置 (DecentHolograms)
-```yaml
-hologram:
-  lines:
-    - "&6&l⚡ BOSS 刷怪点 ⚡"
-    - "&f剩余时间: &a%mmspawner_time_boss%"
-    - "&f状态: %mmspawner_status_boss%"
 ```
 
 ## 🔧 技术架构
