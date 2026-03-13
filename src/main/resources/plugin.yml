@@ -1,0 +1,13 @@
+name: MMSpawnerTimerHD
+version: '${version}'
+main: org.restond.mmspawnertimerhd.MMSpawnerTimer
+
+author: Restond
+description: MythicMobs 刷怪点倒计时插件，支持 PlaceholderAPI 变量
+
+depend:
+  - PlaceholderAPI
+
+softdepend:
+  - MythicMobs
+  - DecentHolograms
