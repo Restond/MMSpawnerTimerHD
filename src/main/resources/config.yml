@@ -1,15 +1,14 @@
 # 作者: Restond
 
-# 支持变量：
-# - %mmspawner_config_text% - 配置的倒计时文本
-# - %mmspawner_remaining_<刷新点名称>% - 剩余秒数
-# - %mmspawner_time_<刷新点名称>% - 格式化时间 (mm:ss)
+# 支持变量
+# - %mmspawner_cooldown_remaining_<刷新点名称>% - cooldown 剩余秒数
+# - %mmspawner_cooldown_time_<刷新点名称>% - cooldown 格式化时间
+# - %mmspawner_warmup_remaining_<刷新点名称>% - warmup 剩余秒数
+# - %mmspawner_warmup_time_<刷新点名称>% - warmup 格式化时间
 # - %mmspawner_status_<刷新点名称>% - 状态文本
-# - %mmspawner_ready_<刷新点名称>% - 是否就绪 (true/false)
-
-# 倒计时显示文本
-countdown:
-  text: "等待刷怪中..."
+# - %mmspawner_ready_<刷新点名称>% - 是否就绪
+# - %mmspawner_warmup_<刷新点名称>% - 预热时间/秒
+# - %mmspawner_cooldown_<刷新点名称>% - 冷却时间/秒
 
 # 时间显示格式
 # HH - 小时, mm - 分钟, ss - 秒
@@ -19,7 +18,9 @@ time-format: "mm:ss"
 messages:
   # 刷怪点已就绪时显示
   ready: "已刷新"
-  # 倒计时进行中显示
-  counting: "计时中"
+  # warmup 倒计时中显示
+  warmup: "预热中"
+  # cooldown 倒计时中显示
+  cooldown: "冷却中"
   # 刷怪点不存在时显示
   not-found: "N/A"

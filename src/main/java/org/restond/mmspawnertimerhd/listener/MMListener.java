@@ -2,6 +2,7 @@ package org.restond.mmspawnertimerhd.listener;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent;
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
 import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
 import io.lumine.xikage.mythicmobs.spawning.spawners.MythicSpawner;
 import org.bukkit.entity.Entity;
@@ -43,9 +44,28 @@ public class MMListener implements Listener {
 
                 String spawnerName = spawner.getName();
                 int cooldown = spawner.getCooldownSeconds();
+                int warmup = spawner.getWarmupSeconds();
 
-                plugin.getSpawnerMonitor().recordSpawn(spawnerName, cooldown);
+                plugin.getSpawnerMonitor().recordSpawn(spawnerName, cooldown, warmup);
             }
         }.runTaskLater(plugin, 1L);
+    }
+
+    @EventHandler
+    public void onMobDeath(MythicMobDeathEvent event) {
+        Entity entity = event.getEntity();
+
+        ActiveMob activeMob = MythicMobs.inst().getAPIHelper().getMythicMobInstance(entity);
+        if (activeMob == null) {
+            return;
+        }
+
+        MythicSpawner spawner = activeMob.getSpawner();
+        if (spawner == null) {
+            return;
+        }
+
+        String spawnerName = spawner.getName();
+        plugin.getSpawnerMonitor().recordDeath(spawnerName);
     }
 }

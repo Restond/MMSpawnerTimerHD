@@ -11,3 +11,10 @@ depend:
 softdepend:
   - MythicMobs
   - DecentHolograms
+
+commands:
+  mmspawntimer:
+    description: 重载插件配置
+    usage: /mmspawntimer reload
+    permission: mmspawntimer.reload
+    permission-message: 没有权限执行此命令

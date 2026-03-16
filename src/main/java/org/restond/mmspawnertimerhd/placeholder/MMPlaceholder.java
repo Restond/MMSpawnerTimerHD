@@ -40,37 +40,69 @@ public class MMPlaceholder extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, @NotNull String params) {
         SpawnerData data = getSpawnerDataFromParams(params);
 
-        if (params.startsWith("remaining_")) {
+        // cooldown 剩余秒数
+        if (params.startsWith("cooldown_remaining_")) {
             if (data == null) return plugin.getMessage("not-found");
-            if (data.isReady()) return plugin.getMessage("ready");
-            return String.valueOf(data.getRemainingSeconds());
+            int remaining = data.getCooldownRemainingSeconds();
+            if (remaining <= 0) return plugin.getMessage("ready");
+            return String.valueOf(remaining);
         }
 
-        if (params.startsWith("time_")) {
+        // cooldown 格式化时间
+        if (params.startsWith("cooldown_time_")) {
             if (data == null) return plugin.getMessage("not-found");
-            if (data.isReady()) return plugin.getMessage("ready");
-            return data.getFormattedTime(plugin.getTimeFormat());
+            int remaining = data.getCooldownRemainingSeconds();
+            if (remaining <= 0) return plugin.getMessage("ready");
+            return SpawnerData.formatTime(remaining, plugin.getTimeFormat());
         }
 
+        // warmup 剩余秒数
+        if (params.startsWith("warmup_remaining_") || params.startsWith("remaining_")) {
+            if (data == null) return plugin.getMessage("not-found");
+            int remaining = data.getWarmupRemainingSeconds();
+            if (remaining <= 0) return plugin.getMessage("ready");
+            return String.valueOf(remaining);
+        }
+
+        // warmup 格式化时间
+        if (params.startsWith("warmup_time_") || params.startsWith("time_")) {
+            if (data == null) return plugin.getMessage("not-found");
+            int remaining = data.getWarmupRemainingSeconds();
+            if (remaining <= 0) return plugin.getMessage("ready");
+            return SpawnerData.formatTime(remaining, plugin.getTimeFormat());
+        }
+
+        // 状态
         if (params.startsWith("status_")) {
             if (data == null) return plugin.getMessage("not-found");
-            return data.isReady() ? plugin.getMessage("ready") : plugin.getMessage("counting");
+            if (!data.isWarmupReady()) return plugin.getMessage("warmup");
+            if (!data.isCooldownReady()) return plugin.getMessage("cooldown");
+            return plugin.getMessage("ready");
         }
 
+        // 是否就绪
         if (params.startsWith("ready_")) {
             if (data == null) return "false";
-            return String.valueOf(data.isReady());
+            return String.valueOf(data.isWarmupReady());
         }
 
-        if (params.equals("config_text")) {
-            return plugin.getCountdownText();
+        // warmup 总秒数
+        if (params.startsWith("warmup_")) {
+            if (data == null) return plugin.getMessage("not-found");
+            return String.valueOf(data.getWarmupSeconds());
+        }
+
+        // cooldown 总秒数
+        if (params.startsWith("cooldown_")) {
+            if (data == null) return plugin.getMessage("not-found");
+            return String.valueOf(data.getCooldownSeconds());
         }
 
         return null;
     }
 
     private SpawnerData getSpawnerDataFromParams(String params) {
-        String spawnerName = params.replaceFirst("^(remaining_|time_|status_|ready_)", "");
+        String spawnerName = params.replaceFirst("^(status_|ready_|warmup_remaining_|warmup_time_|cooldown_remaining_|cooldown_time_|warmup_|cooldown_)", "");
         return plugin.getSpawnerMonitor().getSpawnerData(spawnerName);
     }
 }

@@ -7,66 +7,74 @@ package org.restond.mmspawnertimerhd.model;
 public class SpawnerData {
     private final String spawnerName;
     private long lastSpawnTime;
+    private long lastDeathTime;
     private int cooldownSeconds;
-    private int remainingSeconds;
+    private int warmupSeconds;
 
-    public SpawnerData(String spawnerName, int cooldownSeconds) {
+    public SpawnerData(String spawnerName, int cooldownSeconds, int warmupSeconds) {
         this.spawnerName = spawnerName;
         this.cooldownSeconds = cooldownSeconds;
-        this.remainingSeconds = cooldownSeconds;
+        this.warmupSeconds = warmupSeconds;
+        this.lastSpawnTime = System.currentTimeMillis();
+        this.lastDeathTime = 0;
+    }
+
+    /**
+     * 获取 cooldown 剩余秒数（刷新后开始倒计时）
+     */
+    public int getCooldownRemainingSeconds() {
+        if (cooldownSeconds <= 0) return 0;
+        long elapsed = (System.currentTimeMillis() - lastSpawnTime) / 1000;
+        return Math.max(0, cooldownSeconds - (int) elapsed);
+    }
+
+    /**
+     * 获取 warmup 剩余秒数（死亡后开始倒计时）
+     */
+    public int getWarmupRemainingSeconds() {
+        if (lastDeathTime == 0) return 0; // 未死亡过
+        if (warmupSeconds <= 0) return 0;
+        long elapsed = (System.currentTimeMillis() - lastDeathTime) / 1000;
+        return Math.max(0, warmupSeconds - (int) elapsed);
+    }
+
+    public int getWarmupSeconds() {
+        return this.warmupSeconds;
+    }
+
+    /**
+     * 记录怪物刷新（开始 cooldown 倒计时）
+     */
+    public void recordSpawn() {
         this.lastSpawnTime = System.currentTimeMillis();
     }
 
-    public int getCooldownSeconds() {
-        return this.cooldownSeconds;
-    }
-
-    public int getRemainingSeconds() {
-        return this.remainingSeconds;
-    }
-
-    public long getLastSpawnTime() {
-        return this.lastSpawnTime;
+    /**
+     * 记录怪物死亡（开始 warmup 倒计时）
+     */
+    public void recordDeath() {
+        this.lastDeathTime = System.currentTimeMillis();
     }
 
     /**
-     * 更新剩余时间（基于时间戳计算）
+     * 检查 cooldown 是否结束
      */
-    public void updateRemainingSeconds() {
-        long currentTime = System.currentTimeMillis();
-        long remainingMillis = (lastSpawnTime + (long) cooldownSeconds * 1000) - currentTime;
-        this.remainingSeconds = (int) Math.max(0, remainingMillis / 1000);
+    public boolean isCooldownReady() {
+        return getCooldownRemainingSeconds() <= 0;
     }
 
     /**
-     * 重置计时器（怪物刷新时调用）
+     * 检查 warmup 是否结束（是否可以刷新新怪物）
      */
-    public void resetTimer() {
-        this.lastSpawnTime = System.currentTimeMillis();
-        this.remainingSeconds = cooldownSeconds;
+    public boolean isWarmupReady() {
+        return getWarmupRemainingSeconds() <= 0;
     }
 
     /**
-     * 检查刷怪点是否已就绪
+     * 获取格式化的时间
      */
-    public boolean isReady() {
-        return remainingSeconds <= 0;
-    }
-
-    public void setLastSpawnTime(long lastSpawnTime) {
-        this.lastSpawnTime = lastSpawnTime;
-    }
-
-    public void setCooldownSeconds(int cooldownSeconds) {
-        this.cooldownSeconds = cooldownSeconds;
-    }
-
-    /**
-     * 获取格式化的剩余时间，支持自定义格式
-     * @param format 格式字符串，如 "mm:ss" 或 "HH:mm:ss"
-     */
-    public String getFormattedTime(String format) {
-        int seconds = Math.max(0, remainingSeconds);
+    public static String formatTime(int seconds, String format) {
+        seconds = Math.max(0, seconds);
         int hours = seconds / 3600;
         int minutes = (seconds % 3600) / 60;
         int secs = seconds % 60;
@@ -77,7 +85,31 @@ public class SpawnerData {
                 .replace("ss", String.format("%02d", secs));
     }
 
+    public void setWarmupSeconds(int warmupSeconds) {
+        this.warmupSeconds = warmupSeconds;
+    }
+
+    public int getCooldownSeconds() {
+        return this.cooldownSeconds;
+    }
+
+    public void setCooldownSeconds(int cooldownSeconds) {
+        this.cooldownSeconds = cooldownSeconds;
+    }
+
+    public long getLastSpawnTime() {
+        return this.lastSpawnTime;
+    }
+
+    public void setLastSpawnTime(long lastSpawnTime) {
+        this.lastSpawnTime = lastSpawnTime;
+    }
+
     public String getSpawnerName() {
-        return spawnerName;
+        return this.spawnerName;
+    }
+
+    public long getLastDeathTime() {
+        return this.lastDeathTime;
     }
 }

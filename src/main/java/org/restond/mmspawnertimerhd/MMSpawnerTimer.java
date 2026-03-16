@@ -2,6 +2,7 @@ package org.restond.mmspawnertimerhd;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.restond.mmspawnertimerhd.command.reload;
 import org.restond.mmspawnertimerhd.listener.MMListener;
 import org.restond.mmspawnertimerhd.manager.MMSpawnerMonitor;
 import org.restond.mmspawnertimerhd.placeholder.MMPlaceholder;
@@ -9,10 +10,10 @@ import org.restond.mmspawnertimerhd.placeholder.MMPlaceholder;
 public final class MMSpawnerTimer extends JavaPlugin {
 
     private MMSpawnerMonitor spawnerMonitor;
-    private String countdownText;
     private String timeFormat;
     private String messageReady;
-    private String messageCounting;
+    private String messageWarmup;
+    private String messageCooldown;
     private String messageNotFound;
 
     @Override
@@ -31,39 +32,32 @@ public final class MMSpawnerTimer extends JavaPlugin {
         loadConfig();
 
         this.spawnerMonitor = new MMSpawnerMonitor(this);
-        this.spawnerMonitor.loadData();
-        this.spawnerMonitor.startMonitoring();
+        this.spawnerMonitor.reloadFromMythicMobs();
 
         Bukkit.getPluginManager().registerEvents(new MMListener(this), this);
         new MMPlaceholder(this).register();
+
+        getCommand("mmspawntimer").setExecutor(new reload(this));
 
         getLogger().info("MMSpawnerTimerHD v" + getDescription().getVersion() + " 已成功加载！");
     }
 
     @Override
     public void onDisable() {
-        if (spawnerMonitor != null) {
-            spawnerMonitor.stopMonitoring();
-            spawnerMonitor.saveData();
-        }
         getLogger().info("MMSpawnerTimerHD 已卸载");
     }
 
     public void loadConfig() {
-        countdownText = getConfig().getString("countdown.text", "等待刷怪中...");
         timeFormat = getConfig().getString("time-format", "mm:ss");
 
+        messageWarmup = getConfig().getString("messages.warmup", "预热中");
+        messageCooldown = getConfig().getString("messages.cooldown", "冷却中");
         messageReady = getConfig().getString("messages.ready", "已刷新");
-        messageCounting = getConfig().getString("messages.counting", "计时中");
         messageNotFound = getConfig().getString("messages.not-found", "N/A");
     }
 
     public MMSpawnerMonitor getSpawnerMonitor() {
         return spawnerMonitor;
-    }
-
-    public String getCountdownText() {
-        return countdownText;
     }
 
     public String getTimeFormat() {
@@ -74,8 +68,10 @@ public final class MMSpawnerTimer extends JavaPlugin {
         switch (key) {
             case "ready":
                 return messageReady;
-            case "counting":
-                return messageCounting;
+            case "warmup":
+                return messageWarmup;
+            case "cooldown":
+                return messageCooldown;
             case "not-found":
                 return messageNotFound;
             default:
